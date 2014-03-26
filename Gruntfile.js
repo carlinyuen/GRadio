@@ -16,11 +16,13 @@ module.exports = function (grunt) {
   grunt.initConfig({
 
     cssmin: {
-      combine: {
-        files: {
-          'public/css/core.css': 'public/bower_components/bootstrap.css/css/bootstrap.css'
-        }
-      }
+			minify: {
+				expand: true,
+				cwd: 'public/css',
+				src: ['*.css', '!*.min.css'],
+				dest: 'public/css',
+				ext: '.min.css'
+			}
     },
 
     less: {
@@ -43,7 +45,9 @@ module.exports = function (grunt) {
           style: 'compressed'
         },
         files: {
-          'public/css/core.css': 'public/bower_components/sass-bootstrap/lib/bootstrap.scss',
+          'public/css/core.css': [
+						'public/bower_components/sass-bootstrap/lib/bootstrap.scss'
+					]
         }
       }
     },
@@ -111,8 +115,9 @@ module.exports = function (grunt) {
         },
         css: {
             files: [
-                'public/css/**/*.css',
+                'public/css/**/*.{css,scss,sass}',
             ],
+						tasks: ['build']
         },
         less: {
             files: ['public/bower_components/bootstrap/less/**/*.less'],
@@ -201,7 +206,7 @@ module.exports = function (grunt) {
  
   //grunt.registerTask('server', ['build', 'connect:livereload', 'open', 'watch']);
  
-  grunt.registerTask('build', ['sass', 'concat', 'uglify']);
+  grunt.registerTask('build', ['sass', 'cssmin', 'concat', 'uglify']);
 
   grunt.registerTask('launch', ['wait', 'open']);
 
