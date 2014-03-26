@@ -1,88 +1,90 @@
 <!DOCTYPE html>
 <html class="no-js">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>GRadio</title>
-        <meta name="description" content="Group Radio.">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta property="og:title" content="Carlin's Favorite Radio"/>
-		<meta property="og:image" content="http://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-ash4/215372_1005485932569_6631_n.jpg"/>
-		<link rel="image_src" type="image/jpeg" href="http://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-ash4/215372_1005485932569_6631_n.jpg" />
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>GRadio</title>
+	<meta name="description" content="Group Radio.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="Carlin's Favorite Radio"/>
+	<meta property="og:image" content="http://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-ash4/215372_1005485932569_6631_n.jpg"/>
+	<link rel="image_src" type="image/jpeg" href="http://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-ash4/215372_1005485932569_6631_n.jpg" />
 
-        <link rel="stylesheet" href="css/core.css">
+	<link rel="stylesheet" href="css/core.min.css">
+	<link rel="stylesheet" href="css/main.min.css">
 
-        <style>
+</head>
 
-        	input:focus,
-			select:focus,
-			textarea:focus,
-			button:focus {
-			    outline: none !important;
-			}
-
-        	#allPosts {
-			    resize: none;
-			    font-size: 12px;
-			    border-radius: 5px;
-			    border: #ccc solid 1px;
-			    line-height: 14px;
-			    height:100px;
-			    overflow: scroll;
-			}
-
-			p{
-		    	margin:0;
-		    	padding:0;
-		    }
-
-		</style>
-    </head>
-    <body>
+<body>
 
 	<!--[if lt IE 8]>
 		<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
 
-	<iframe src="http://bit.ly/131M8c7" style="margin:0; padding:0; border-width:0;" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+	<video id="player" controls="" autoplay="" name="media">
+		<source src="http://7609.live.streamtheworld.com/977_HITS_SC" type="audio/mpeg">
+	</video>
 
-    <div class="container">
-    	<div class="jumbotron">
-        	<h1>GRadio</h1>
-       		<p>Group Radio.</p>
-       		<div class="row">
-       			<div class="col-md-4 col-sm-6 col-xs-6">
-       				<h3>All Chatter<button id="clearAllPosts" type="button" class="btn btn-danger btn-xs pull-right">clear</button></h3>
-       				<div id="allPosts" class="form-control"></div>
-				    <div class="input-group">
-						<input id="blast" type="text" class="form-control" placeholder="send something to everyone">
-						<span class="input-group-btn">
-							<button id="send" class="btn btn-success" type="button">Send</button>
-						</span>
-				    </div><!-- /input-group -->
-       			</div>
-       		</div>
+	<div class="container">
+
+		<nav class="navbar" role="navigation">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<h1><a class="navbar-brand" href="#">GRadio</a></h1>
+				</div>
+
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">Hot Stuff</a></li>
+						<li><a href="#">Symphonic</a></li>
+						<li><a href="#">Calm</a></li>
+						<li><a href="#">Random</a></li>
+					</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav>
+
+		<div class="row">
+			<div class="col-md-4 col-sm-6 col-xs-6">
+				<h3>All Chatter<button id="clearAllPosts" type="button" class="btn btn-danger btn-xs pull-right">clear</button></h3>
+				<div id="allPosts" class="form-control"></div>
+				<div class="input-group">
+					<input id="blast" type="text" class="form-control" placeholder="send something to everyone">
+					<span class="input-group-btn">
+						<button id="send" class="btn btn-success" type="button">Send</button>
+					</span>
+				</div><!-- /input-group -->
+			</div>
 		</div>
+
 	</div>
 
     <!-- jQuery -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="public/bower_components/jQuery/jquery.min.js"><\/script>')</script>
 
-    <!-- socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
+	<!-- socket.io -->
+	<script src="/socket.io/socket.io.js"></script>
 
 	<!-- APP CODE -->
 	<script src="js/app.min.js"></script>
 
 	<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-    <script>
-        (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-        e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-        e.src='//www.google-analytics.com/analytics.js';
-        r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-        ga('create','UA-XXXXX-X');ga('send','pageview');
-    </script>
-    </body>
+	<script>
+		(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+		function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+		e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+		e.src='//www.google-analytics.com/analytics.js';
+		r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+		ga('create','UA-XXXXX-X');ga('send','pageview');
+	</script>
+</body>
 </html>
