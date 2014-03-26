@@ -19,7 +19,8 @@ app.configure(function(){
 	app.use(express.static(__dirname + '/public'));
 
 	//set the view engine
-	app.set('view engine', 'ejs');
+	app.engine('html', require('ejs').renderFile);
+	app.set('view engine', 'html');
 	app.set('views', __dirname +'/views');
 
 	app.use(device.capture());
