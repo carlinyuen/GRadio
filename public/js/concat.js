@@ -109,13 +109,16 @@ $(function()
 			bottom: (chatCollapsed ? -$form.height() : 0) 
 		}, 200);
 	});
+
+	// Default volume to lower level when first loaded
+	$player[0].volume = 0.33;
 	
-	// Get any query param source and start audio, else go with first nav button
+	// Get any query param source and start audio
 	var source = getParam('source');
 	if (source) {
 		console.log('onload source:', source);
 		changeStation(source);
-	} else {
+	} else {	// Start default first station
 		$('li a').get(0).click();
 	}
 
