@@ -15,7 +15,9 @@ var app = app || {};
 $(function()
 {
 	// Constants
-	var TIME_CHATBOX_ANIMATION = 400;
+	var TIME_CHATBOX_ANIMATION = 400
+		, TIME_CHATBOX_HIDE = 1000 * 6
+	;
 
 	// Element references
 	var $form = $('form')
@@ -26,7 +28,10 @@ $(function()
 	;
 
 	// Variables
-	var username;
+	var username
+		, color 
+		, hideChatboxTimer
+	;
 
 	// Navigation bar
 	$('li a').click(function (event) 
@@ -79,7 +84,10 @@ $(function()
 	{
 		// Create element to hold escaped text message
 		$(document.createElement('p')).text(data.msg)
-			.prepend($(document.createElement('strong')).text(data.username))
+			.prepend($(document.createElement('strong'))
+				.text(data.username)
+				.css({ color: (data.username === username) ? color : data.color })
+			)
 			.appendTo($messages);
 
 		// Scroll to bottom
@@ -97,6 +105,7 @@ $(function()
 	// Send button click
 	$sendButton.click(function(e)
 	{
+		clearTimeout(hideChatboxTimer);	// Don't mess with it if user is messing with it
 		var message = $inputField.val();
 		if (message.length) {
 			socket.emit('message', { 
@@ -109,6 +118,7 @@ $(function()
 
 	// Send button enter press
 	$inputField.keydown(function (e) {
+		clearTimeout(hideChatboxTimer);	// Don't mess with it if user is messing with it
 		if (e.keyCode == 13) {
 			$sendButton.trigger('click');
 		}
@@ -121,8 +131,10 @@ $(function()
 
 	// Toggle show / hide of chat box
 	var chatCollapsed = false;
-	function toggleChatBox(event) {
-		chatCollapsed = !chatCollapsed;
+	function toggleChatBox(event) 
+	{
+		clearTimeout(hideChatboxTimer);	// Don't reopen it
+		chatCollapsed = !chatCollapsed;	// Toggle closed status
 		$form.animate({
 			bottom: (chatCollapsed ? -$form.height() : 0) 
 		}, TIME_CHATBOX_ANIMATION);
@@ -143,15 +155,16 @@ $(function()
 		$('li a')[0].click();
 	}
 
-	// Default to collapsed, do this after delay to prevent jitter
-	setTimeout(toggleChatBox, TIME_CHATBOX_ANIMATION);
+	// Default to collapsed, do this after delay if user doesn't use it
+	hideChatboxTimer = setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
 
 	// Ask for username
 	var name = prompt('Who are you?');
 	socket.emit('setName', { 
 		name: name
-	}, function(name) {
-		username = name;
+	}, function(data) {
+		username = data.name;
+		color = data.color;
 	});
 
 });
