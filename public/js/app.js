@@ -105,7 +105,7 @@ $(function()
 		chatCollapsed = !chatCollapsed;
 		$form.animate({
 			bottom: (chatCollapsed ? -$form.height() : 0) 
-		}, 200);
+		}, 300);
 	}
 
 	// Collapse button
