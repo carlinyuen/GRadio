@@ -22,12 +22,12 @@ app.configure(function() {
 
 // logs every request
 app.use(function(req, res, next){
-	console.log(req);
+	console.log({method:req.method, url: req.url});
 	next();
 });
 
 // Route index
-app.get("/", function(req, res){
+app.get('/', function(req, res){
 	res.render('index', {});
 });
 
@@ -38,7 +38,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('setName', function (name) {
 		socket.set('name', name, function () {
 			io.sockets.emit('message', {
-				msg:"<p class='text-muted'>" + name + " just joined!</p>"
+				msg:'<p class="text-muted">' + name + ' just joined!</p>'
 			});
 		});
 	});
