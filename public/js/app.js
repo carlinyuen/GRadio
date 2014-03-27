@@ -92,9 +92,14 @@ $(function()
 
 	// Send button enter press
 	$inputField.keydown(function (e) {
-	    if (e.keyCode == 13) {
-	        $sendButton.trigger('click');
-	    }
+		if (e.keyCode == 13) {
+			$sendButton.trigger('click');
+		}
+	});
+
+	// Prevent form submit
+	$('form').submit(function(event) {
+		event.preventDefault();
 	});
 	
 	// Get any query param source and start audio, else go with first nav button
