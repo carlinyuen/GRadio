@@ -7,7 +7,8 @@ var app = app || {};
 $(function()
 {
 	// Element references
-	var $inputField = $('#input')
+	var $form = $('form')
+		, $inputField = $('#input')
 		, $messages = $('#messages')
 		, $sendButton = $('#send')
 		, $player = $('#player')
@@ -92,8 +93,17 @@ $(function()
 	});
 
 	// Prevent form submit
-	$('form').submit(function(event) {
+	$form.submit(function(event) {
 		event.preventDefault();
+	});
+
+	// Collapse button
+	var chatCollapsed = false;
+	$('.collapseButton').click(function(event) {
+		chatCollapsed = !chatCollapsed;
+		$form.animate({
+			bottom: (chatCollapsed ? -$form.height() : 0) 
+		}, 200);
 	});
 	
 	// Get any query param source and start audio, else go with first nav button
