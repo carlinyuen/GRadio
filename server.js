@@ -38,21 +38,26 @@ io.sockets.on('connection', function (socket) {
 	socket.on('setName', function (data, callback) 
 	{
 		var name;
-		if (!data || !data.name || !data.name.length) {
+		if (!data || !data.name || !data.name.trim().length) {
 			name = 'Mystery wo/man';
 		} else {
-			name = data.name;
+			name = data.name.trim();
 		}
 
-		socket.set('name', name, function () {
+		// Set name and emit to others
+		socket.set('name', name, function() {
 			io.sockets.emit('notification', {
-				msg:'<p class="text-warning">' + name + ' just joined!</p>'
+				msg:'<p class="text-warning">' + name + ' joined the fray!</p>'
 			});
 		});
 
-		if (callback) {
-			callback(name);
-		}
+		// Get color and send it back
+		var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+		socket.set('color', color, function() {
+			if (callback) {
+				callback({name: name, color: color});
+			}
+		});
 	});
 
 	// Listen for messages
@@ -65,8 +70,14 @@ io.sockets.on('connection', function (socket) {
 			if (err) {
 				console.log(err);
 			} else {
-				// Pass message to all connected sockets
-				io.sockets.emit('message', { msg: data.msg, username: name });
+				socket.get('color', function(err, color) {
+					if (err) {
+						console.log(err);
+					} else {
+						// Pass message to all connected sockets
+						io.sockets.emit('message', { msg: data.msg, username: name, color: color });
+					}
+				});
 			}
 		});
 
