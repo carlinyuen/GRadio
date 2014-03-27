@@ -101,14 +101,20 @@ $(function()
 		event.preventDefault();
 	});
 
-	// Collapse button
+	// Toggle show / hide of chat box
 	var chatCollapsed = false;
-	$('.collapseButton').click(function(event) {
+	function toggleChatBox(event) {
 		chatCollapsed = !chatCollapsed;
 		$form.animate({
 			bottom: (chatCollapsed ? -$form.height() : 0) 
 		}, 200);
-	});
+	}
+
+	// Collapse button
+	$('.collapseButton').click(toggleChatBox);
+
+	// Default to collapsed
+	toggleChatBox();
 
 	// Default volume to lower level when first loaded
 	$player[0].volume = 0.33;
@@ -119,7 +125,7 @@ $(function()
 		console.log('onload source:', source);
 		changeStation(source);
 	} else {	// Start default first station
-		$('li a').get(0).click();
+		$('li a')[0].click();
 	}
 
 });
