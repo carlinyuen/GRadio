@@ -35,12 +35,24 @@ app.get('/', function(req, res){
 io.sockets.on('connection', function (socket) {
 
 	// Set name and let people know you joined
-	socket.on('setName', function (name) {
+	socket.on('setName', function (data, callback) 
+	{
+		var name;
+		if (!data || !data.name || !data.name.length) {
+			name = 'Mystery wo/man';
+		} else {
+			name = data.name;
+		}
+
 		socket.set('name', name, function () {
-			io.sockets.emit('message', {
-				msg:'<p class="text-muted">' + name + ' just joined!</p>'
+			io.sockets.emit('notification', {
+				msg:'<p class="text-warning">' + name + ' just joined!</p>'
 			});
 		});
+
+		if (callback) {
+			callback(name);
+		}
 	});
 
 	// Listen for messages
@@ -48,8 +60,15 @@ io.sockets.on('connection', function (socket) {
 	{
 		console.log(data);
 
-		// Pass message to all connected sockets
-		io.sockets.emit('message', { msg: data.msg });
+		// Get associated username
+		socket.get('name', function(err, name) {
+			if (err) {
+				console.log(err);
+			} else {
+				// Pass message to all connected sockets
+				io.sockets.emit('message', { msg: data.msg, username: name });
+			}
+		});
 
 		// Then call callback if exists
 		if (callback) {
