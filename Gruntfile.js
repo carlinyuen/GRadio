@@ -25,20 +25,6 @@ module.exports = function (grunt) {
 			}
     },
 
-    less: {
-      options: {
-        //report:'gzip'
-      },
-      production: {
-        options: {
-          cleancss: true
-        },
-        files: {
-          "public/css/core.css": "public/bower_components/bootstrap/less/bootstrap.less"
-        }
-      }
-    },
-    
     sass: {
       dist: {
         options: {
@@ -52,24 +38,16 @@ module.exports = function (grunt) {
       }
     },
 
-    stylus: {
-      compile: {
-        options: {
-          compress:true
-        },
-        files: {
-          'public/css/core.css': 'public/bower_components/bootstrap-stylus/stylus/bootstrap.styl'
-        }
-      }
-    },
-
     concat: {
       options: {
         separator: ';',
         stripBanners:true
       },
       dist: {
-        src: ['public/js/app.js'],
+        src: [
+					'public/bower_components/sass-bootstrap/dist/js/bootstrap.min.js',
+					'public/js/app.js'
+				],
         dest: 'public/js/concat.js',
       },
     },

@@ -26,11 +26,7 @@ $(function()
 		event.preventDefault();	// Don't allow page change
 
 		// Get source
-		console.log('clicked:', this);
-		var href = $(this).attr('href');
-		console.log('href:', href);
-		var newSource = getParam('source', href);
-		console.log('param:', newSource);
+		var newSource = getParam('source', $(this).attr('href'));
 
 		// Change out source of audio
 		changeStation(newSource);
