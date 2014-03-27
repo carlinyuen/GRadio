@@ -13,47 +13,52 @@ var device  = require('express-device');
 
 var runningPortNumber = process.env.PORT;
 
-
-app.configure(function(){
-	// I need to access everything in '/public' directly
+app.configure(function() {
 	app.use(express.static(__dirname + '/public'));
-
-	//set the view engine
 	app.engine('html', require('ejs').renderFile);
 	app.set('view engine', 'html');
 	app.set('views', __dirname +'/views');
-
-	app.use(device.capture());
 });
-
 
 // logs every request
 app.use(function(req, res, next){
-	// output every request in the array
-	console.log({method:req.method, url: req.url, device: req.device});
-
-	// goes onto the next function in line
+	console.log(req);
 	next();
 });
 
+// Route index
 app.get("/", function(req, res){
 	res.render('index', {});
 });
 
-
+// SocketIO - setup when new socket connection is created
 io.sockets.on('connection', function (socket) {
 
-	io.sockets.emit('blast', {msg:"<span style=\"color:red !important\">someone connected</span>"});
+	// Set name and let people know you joined
+	socket.on('setName', function (name) {
+		socket.set('name', name, function () {
+			io.sockets.emit('message', {
+				msg:"<p class='text-muted'>" + name + " just joined!</p>"
+			});
+		});
+	});
 
-	socket.on('blast', function(data, fn){
+	// Listen for messages
+	socket.on('message', function(data, callback) 
+	{
 		console.log(data);
-		io.sockets.emit('blast', {msg:data.msg});
 
-		fn();//call the client back to clear out the field
+		// Pass message to all connected sockets
+		io.sockets.emit('message', { msg: data.msg });
+
+		// Then call callback if exists
+		if (callback) {
+			callback();
+		}
 	});
 
 });
 
-
+// Start server
 server.listen(runningPortNumber);
 

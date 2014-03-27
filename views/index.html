@@ -43,7 +43,7 @@
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse">
-					<ul class="nav navbar-nav">
+					<ul class="nav navbar-nav pull-right">
 						<li class="active"><a href="#">Hot Stuff</a></li>
 						<li><a href="#">Symphonic</a></li>
 						<li><a href="#">Calm</a></li>
@@ -53,23 +53,22 @@
 			</div><!-- /.container-fluid -->
 		</nav>
 
-		<div class="row">
-			<div class="col-md-4 col-sm-6 col-xs-6">
-				<h3>All Chatter<button id="clearAllPosts" type="button" class="btn btn-danger btn-xs pull-right">clear</button></h3>
-				<div id="allPosts" class="form-control"></div>
-				<div class="input-group">
-					<input id="blast" type="text" class="form-control" placeholder="send something to everyone">
-					<span class="input-group-btn">
-						<button id="send" class="btn btn-success" type="button">Send</button>
-					</span>
-				</div><!-- /input-group -->
+		<form id="chatBox" role="form">
+			<div class="form-group">
+				<div class="form-control" id="messages"></div>
 			</div>
-		</div>
+			<div class="input-group">
+				<input id="input" type="text" class="form-control" placeholder="Say hi!">
+				<span class="input-group-btn">
+					<button id="send" class="btn btn-default" type="button">Send</button>
+				</span>
+			</div>
+		</form>
 
 	</div>
 
     <!-- jQuery -->
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="public/bower_components/jQuery/jquery.min.js"><\/script>')</script>
 
 	<!-- socket.io -->

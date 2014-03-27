@@ -3,45 +3,37 @@ var socket = io.connect(window.location.href);
 
 var app = app || {};
 
+// On document.ready
+$(function()
+{
+	// Element references
+	var $inputField = $('#input'),
+		$messages = $('#messages'),
+		$sendButton = $('#send');
 
-// shortcut for document.ready
-$(function(){
-	//setup some common vars
-	var $blastField = $('#blast'),
-		$allPostsTextArea = $('#allPosts'),
-		$clearAllPosts = $('#clearAllPosts'),
-		$sendBlastButton = $('#send');
-
-
-	//SOCKET STUFF
-	socket.on("blast", function(data){
-		var copy = $allPostsTextArea.html();
-		$allPostsTextArea.html('<p>' + copy + data.msg + "</p>");
-		$allPostsTextArea.scrollTop($allPostsTextArea[0].scrollHeight - $allPostsTextArea.height());
-		//.css('scrollTop', $allPostsTextArea.css('scrollHeight'));
-
+	// SocketIO setup
+	socket.on("message", function(data)
+	{
+		var copy = $messages.html();
+		$messages.html('<p>' + copy + data.msg + "</p>");
+		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
 	});
 	
-	$clearAllPosts.click(function(e){
-		$allPostsTextArea.text('');
-	});
-
-	$sendBlastButton.click(function(e){
-
-		var blast = $blastField.val();
-		if(blast.length){
-			socket.emit("blast", {msg:blast}, 
-				function(data){
-					$blastField.val('');
-				});
+	$sendButton.click(function(e)
+	{
+		var message = $inputField.val();
+		if (message.length){
+			socket.emit("message", { 
+				msg: message 
+			}, function(data){
+				$inputField.val('');
+			});
 		}
-
-
 	});
 
-	$blastField.keydown(function (e){
+	$inputField.keydown(function (e){
 	    if(e.keyCode == 13){
-	        $sendBlastButton.trigger('click');//lazy, but works
+	        $sendButton.trigger('click');
 	    }
 	})
 	
