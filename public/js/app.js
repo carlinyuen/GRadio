@@ -1,6 +1,6 @@
 /*************************************
 //
-// gradio app
+// GRadio by Carlin Yue
 //
 **************************************/
 
@@ -12,6 +12,9 @@ var app = app || {};
 // On document.ready
 $(function()
 {
+	// Constants
+	var TIME_CHATBOX_ANIMATION = 400;
+
 	// Element references
 	var $form = $('form')
 		, $inputField = $('#input')
@@ -59,9 +62,11 @@ $(function()
 			}
 		});
 
-		// Load and play
-		$player[0].load();
-		$player[0].play();
+		// Load and play - use setTimeout to 'async' it
+		setTimeout(function() {
+			$player[0].load();
+			$player[0].play();
+		}, 0);
 	}
 
 	// SocketIO setup
@@ -105,14 +110,11 @@ $(function()
 		chatCollapsed = !chatCollapsed;
 		$form.animate({
 			bottom: (chatCollapsed ? -$form.height() : 0) 
-		}, 300);
+		}, TIME_CHATBOX_ANIMATION);
 	}
 
 	// Collapse button
 	$('.collapseButton').click(toggleChatBox);
-
-	// Default to collapsed
-	toggleChatBox();
 
 	// Default volume to lower level when first loaded
 	$player[0].volume = 0.33;
@@ -125,5 +127,8 @@ $(function()
 	} else {	// Start default first station
 		$('li a')[0].click();
 	}
+
+	// Default to collapsed, do this after delay to prevent jitter
+	setTimeout(toggleChatBox, TIME_CHATBOX_ANIMATION);
 
 });
