@@ -25,6 +25,9 @@ $(function()
 		, $player = $('#player')
 	;
 
+	// Variables
+	var username;
+
 	// Navigation bar
 	$('li a').click(function (event) 
 	{
@@ -75,7 +78,17 @@ $(function()
 	socket.on('message', function(data)
 	{
 		// Create element to hold escaped text message
-		$(document.createElement('p')).text(data.msg).appendTo($messages);
+		$(document.createElement('p')).text(data.msg)
+			.prepend($(document.createElement('strong')).text(data.username))
+			.appendTo($messages);
+
+		// Scroll to bottom
+		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
+	});
+	socket.on('notification', function(data)
+	{
+		// Only come from server, so theoretically safe to render html
+		$messages.html($messages.html() + data.msg);
 
 		// Scroll to bottom
 		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
@@ -132,5 +145,13 @@ $(function()
 
 	// Default to collapsed, do this after delay to prevent jitter
 	setTimeout(toggleChatBox, TIME_CHATBOX_ANIMATION);
+
+	// Ask for username
+	var name = prompt('Who are you?');
+	socket.emit('setName', { 
+		name: name
+	}, function(name) {
+		username = name;
+	});
 
 });
