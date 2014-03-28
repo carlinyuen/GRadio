@@ -18,7 +18,7 @@ $(function()
 	;
 
 	// Element references
-	var $form = $('form')
+	var $form = $('#chatBox')
 		, $inputField = $('#input')
 		, $messages = $('#messages')
 		, $sendButton = $('#send')
@@ -26,7 +26,8 @@ $(function()
 	;
 
 	// Variables
-	var username
+	var userId
+		, username
 		, color 
 		, hideChatboxTimer
 	;
@@ -77,6 +78,11 @@ $(function()
 		}, 0);
 	}
 
+	// Update listener count
+	function updateRoomCount(roomCount) {
+		$form.attr('data-content', roomCount);
+	}
+
 	// SocketIO setup
 	socket.on('message', function(data)
 	{
@@ -84,9 +90,12 @@ $(function()
 		$(document.createElement('p')).text(data.msg)
 			.prepend($(document.createElement('strong'))
 				.text(data.username)
-				.css({ color: (data.username === username) ? color : data.color })
+				.css({ color: (data.clientId === userId) ? color : data.color })
 			)
 			.appendTo($messages);
+
+		// Update listener count
+		updateRoomCount(data.roomCount);
 
 		// Scroll to bottom
 		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
@@ -95,6 +104,9 @@ $(function()
 	{
 		// Only come from server, so theoretically safe to render html
 		$messages.html($messages.html() + data.msg);
+		
+		// Update listener count
+		updateRoomCount(data.roomCount);
 
 		// Scroll to bottom
 		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
@@ -157,12 +169,18 @@ $(function()
 	hideChatboxTimer = setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
 
 	// Ask for username
-	var name = prompt('Who are you?');
-	socket.emit('setName', { 
-		name: name
-	}, function(data) {
+	var name = prompt('By what name shall thy presence be known? (optional)');
+	socket.emit('setName', { name: name }, function(data) 
+	{
+		console.log('setName:', data);
+
+		// Setup user prefs
+		userId = data.clientId;
 		username = data.name;
 		color = data.color;
+
+		// Update listener count
+		updateRoomCount(data.roomCount);
 	});
 
 });
