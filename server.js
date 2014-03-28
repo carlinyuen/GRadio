@@ -50,7 +50,7 @@ io.sockets.on('connection', function (socket) {
 		// Set name and emit to others
 		socket.set('name', name, function() {
 			io.sockets.emit('notification', {
-				msg:'<p class="text-warning">' + name + ' joined the fray!</p>',
+				msg:'<p class="text-warning">' + name + ' joined the party!</p>',
 				roomCount: userCount
 			});
 		});
