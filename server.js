@@ -28,14 +28,17 @@ app.use(function(req, res, next){
 
 // Route index
 app.get('/', function(req, res){
-	res.render('index', {});
+	res.render('index');
 });
 
 // SocketIO - setup when new socket connection is created
+var userCount = 0;
 io.sockets.on('connection', function (socket) {
 
+	userCount++;
+
 	// Set name and let people know you joined
-	socket.on('setName', function (data, callback) 
+	socket.on('setName', function (data, callback)
 	{
 		var name;
 		if (!data || !data.name || !data.name.trim().length) {
@@ -47,7 +50,8 @@ io.sockets.on('connection', function (socket) {
 		// Set name and emit to others
 		socket.set('name', name, function() {
 			io.sockets.emit('notification', {
-				msg:'<p class="text-warning">' + name + ' joined the fray!</p>'
+				msg:'<p class="text-warning">' + name + ' joined the fray!</p>',
+				roomCount: userCount
 			});
 		});
 
@@ -55,13 +59,18 @@ io.sockets.on('connection', function (socket) {
 		var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
 		socket.set('color', color, function() {
 			if (callback) {
-				callback({name: name, color: color});
+				callback({
+					name: name,
+					clientId: socket.id,
+					color: color,
+					roomCount: userCount
+				});
 			}
 		});
 	});
 
 	// Listen for messages
-	socket.on('message', function(data, callback) 
+	socket.on('message', function(data, callback)
 	{
 		console.log(data);
 
@@ -75,7 +84,13 @@ io.sockets.on('connection', function (socket) {
 						console.log(err);
 					} else {
 						// Pass message to all connected sockets
-						io.sockets.emit('message', { msg: data.msg, username: name, color: color });
+						io.sockets.emit('message', {
+							msg: data.msg,
+							username: name,
+							clientId: socket.id,
+							color: color,
+							roomCount: userCount
+						});
 					}
 				});
 			}
@@ -85,6 +100,23 @@ io.sockets.on('connection', function (socket) {
 		if (callback) {
 			callback();
 		}
+	});
+
+	// Disconnecting
+	socket.on('disconnect', function()
+	{
+		userCount--;
+
+		socket.get('name', function(err, name) {
+			if (err) {
+				console.log(err);
+			} else {
+				io.sockets.emit('notification', {
+					msg:'<p class="text-info">' + name + ' left us. :o(</p>',
+					roomCount: userCount
+				});
+			}
+		});
 	});
 
 });

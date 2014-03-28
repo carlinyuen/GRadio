@@ -87,13 +87,15 @@ module.exports = function (grunt) {
         },
         scripts: {
             files: [
-                'public/js/**/*.js'
+                'public/js/**/*.js',
+                '!public/js/**/*.min.js'
             ],
             tasks:['build']
         },
         css: {
             files: [
-                'public/css/**/*.{css,scss,sass}',
+                'public/css/**/*.css',
+								'!public/css/**/*.min.css'
             ],
 						tasks: ['build']
         },
