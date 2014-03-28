@@ -15,6 +15,7 @@ $(function()
 	// Constants
 	var TIME_CHATBOX_ANIMATION = 400
 		, TIME_CHATBOX_HIDE = 1000 * 6
+		, TIME_CHATBOX_JIGGLE = 50
 	;
 
 	// Element references
@@ -92,33 +93,45 @@ $(function()
 		$form.attr('data-content', roomCount);
 	}
 
-	// SocketIO setup
-	socket.on('message', function(data)
+	// Add message to message view
+	function addMessage($html) 
 	{
+		// Add message
+		$messages.append($html);
+
+		// Scroll to bottom
+		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
+
+		// Jiggle chatbox if hidden
+		if (chatCollapsed) {
+			$form.animate({
+				bottom: -($form.height() - 6)
+			}, TIME_CHATBOX_JIGGLE, 'linear', function() {
+				$form.animate({
+					bottom: -($form.height())
+				}, TIME_CHATBOX_JIGGLE, 'linear');
+			});
+		}
+	}
+
+	// SocketIO setup
+	socket.on('message', function(data) {
 		// Create element to hold escaped text message
-		$(document.createElement('p')).text(data.msg)
+		addMessage($(document.createElement('p')).text(data.msg)
 			.prepend($(document.createElement('strong'))
 				.text(data.username)
 				.css({ color: (data.clientId === userId) ? color : data.color })
-			)
-			.appendTo($messages);
-
+			));
+				
 		// Update listener count
 		updateRoomCount(data.roomCount);
-
-		// Scroll to bottom
-		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
 	});
-	socket.on('notification', function(data)
-	{
+	socket.on('notification', function(data) {
 		// Only come from server, so theoretically safe to render html
-		$messages.html($messages.html() + data.msg);
-		
+		addMessage(data.msg);
+				
 		// Update listener count
 		updateRoomCount(data.roomCount);
-
-		// Scroll to bottom
-		$messages.scrollTop($messages[0].scrollHeight - $messages.height());
 	});
 	
 	// Send button click
@@ -191,5 +204,8 @@ $(function()
 		// Update listener count
 		updateRoomCount(data.roomCount);
 	});
+
+	// Focus in on chatbox
+	$('#input').focus();
 
 });
