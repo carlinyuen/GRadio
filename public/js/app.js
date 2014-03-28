@@ -183,9 +183,6 @@ $(function()
 		$('li a')[0].click();
 	}
 
-	// Default to collapsed, do this after delay if user doesn't use it
-	setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
-
 	// Ask for username
 	var name = prompt('By what name shall thy presence be known? (optional)');
 	socket.emit('setName', { name: name }, function(data) 
@@ -200,5 +197,8 @@ $(function()
 		// Update listener count
 		updateRoomCount(data.roomCount);
 	});
+
+	// Default to collapsed, delay it so it animates smoothly and shows the player
+	setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
 
 });
