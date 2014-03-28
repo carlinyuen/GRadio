@@ -42,6 +42,10 @@ $(function()
 
 		// Change out source of audio
 		changeStation(newSource);
+
+		// Update to active li element
+		$('.navbar').find('li').removeClass('active');
+		$(this).parent('li').addClass('active');
 	});
 
 	// Get GET query param, based on https://gist.github.com/varemenos/2531765 
