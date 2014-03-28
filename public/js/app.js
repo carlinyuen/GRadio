@@ -14,7 +14,7 @@ $(function()
 {
 	// Constants
 	var TIME_CHATBOX_ANIMATION = 400
-		, TIME_CHATBOX_HIDE = 1000 * 6
+		, TIME_CHATBOX_HIDE = 1000
 		, TIME_CHATBOX_JIGGLE = 50
 	;
 
@@ -30,7 +30,6 @@ $(function()
 	var userId
 		, username
 		, color 
-		, hideChatboxTimer
 	;
 
 	// Navigation bar
@@ -137,7 +136,6 @@ $(function()
 	// Send button click
 	$sendButton.click(function(e)
 	{
-		clearTimeout(hideChatboxTimer);	// Don't mess with it if user is messing with it
 		var message = $inputField.val();
 		if (message.length) {
 			socket.emit('message', { 
@@ -150,7 +148,6 @@ $(function()
 
 	// Send button enter press
 	$inputField.keydown(function (e) {
-		clearTimeout(hideChatboxTimer);	// Don't mess with it if user is messing with it
 		if (e.keyCode == 13) {
 			$sendButton.trigger('click');
 		}
@@ -165,7 +162,6 @@ $(function()
 	var chatCollapsed = false;
 	function toggleChatBox(event) 
 	{
-		clearTimeout(hideChatboxTimer);	// Don't reopen it
 		chatCollapsed = !chatCollapsed;	// Toggle closed status
 		$form.animate({
 			bottom: (chatCollapsed ? -$form.height() : 0) 
@@ -188,7 +184,7 @@ $(function()
 	}
 
 	// Default to collapsed, do this after delay if user doesn't use it
-	hideChatboxTimer = setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
+	setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);
 
 	// Ask for username
 	var name = prompt('By what name shall thy presence be known? (optional)');
@@ -204,8 +200,5 @@ $(function()
 		// Update listener count
 		updateRoomCount(data.roomCount);
 	});
-
-	// Focus in on chatbox
-	$('#input').focus();
 
 });
