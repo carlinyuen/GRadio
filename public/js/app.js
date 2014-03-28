@@ -33,7 +33,7 @@ $(function()
 	;
 
 	// Navigation bar
-	$('li a').click(function (event) 
+	$('li a').click(function(event) 
 	{
 		event.preventDefault();	// Don't allow page change
 
@@ -46,6 +46,11 @@ $(function()
 		// Update to active li element
 		$('.navbar').find('li').removeClass('active');
 		$(this).parent('li').addClass('active');
+	});
+
+	// Branding click
+	$('.navbar-brand').click(function(event) {
+		alert("Welcome to Carlin's favorite free online radio stations! Feel free to stick around and say hi in the chatter box.");
 	});
 
 	// Get GET query param, based on https://gist.github.com/varemenos/2531765 
