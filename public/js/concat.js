@@ -181,8 +181,6 @@ $(function()
 	if (source) {
 		console.log('onload source:', source);
 		changeStation(source);
-	} else {	// Start default first station
-		$('li a')[0].click();
 	}
 
 	// Ask for username
