@@ -113,8 +113,11 @@ $(function()
 		}
 	}
 
-	// SocketIO setup
-	socket.on('message', function(data) {
+	// Message received
+	function messageReceived(data) 
+	{
+		console.log('messageReceived:', data);
+
 		// Create element to hold escaped text message
 		addMessage($(document.createElement('p')).text(data.msg)
 			.prepend($(document.createElement('strong'))
@@ -124,14 +127,21 @@ $(function()
 				
 		// Update listener count
 		updateRoomCount(data.roomCount);
-	});
-	socket.on('notification', function(data) {
+	}
+
+	// Notification received
+	function notificationReceived(data) 
+	{
 		// Only come from server, so theoretically safe to render html
 		addMessage(data.msg);
 				
 		// Update listener count
 		updateRoomCount(data.roomCount);
-	});
+	}
+
+	// SocketIO setup
+	socket.on('message', messageReceived);
+	socket.on('notification', notificationReceived);
 	
 	// Send button click
 	$sendButton.click(function(e)
@@ -191,6 +201,12 @@ $(function()
 		userId = data.clientId;
 		username = data.name;
 		color = data.color;
+
+		// Add recent messages
+		console.log('recent:', data.recentMessages);
+		for (var i = 0, l = data.recentMessages.length; i < l; ++i) {
+			messageReceived(data.recentMessages[i]);
+		}
 
 		// Update listener count
 		updateRoomCount(data.roomCount);

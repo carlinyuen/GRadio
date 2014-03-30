@@ -32,7 +32,8 @@ app.get('/', function(req, res){
 });
 
 // SocketIO - setup when new socket connection is created
-var userCount = 0;
+var userCount = 6;
+var recentMessages = [];
 io.sockets.on('connection', function (socket) {
 
 	userCount++;
@@ -63,7 +64,8 @@ io.sockets.on('connection', function (socket) {
 					name: name,
 					clientId: socket.id,
 					color: color,
-					roomCount: userCount
+					roomCount: userCount,
+					recentMessages: recentMessages
 				});
 			}
 		});
@@ -82,15 +84,25 @@ io.sockets.on('connection', function (socket) {
 				socket.get('color', function(err, color) {
 					if (err) {
 						console.log(err);
-					} else {
-						// Pass message to all connected sockets
-						io.sockets.emit('message', {
+					} 
+					else 
+					{
+						// Create message and store for recent messages
+						var message = {
 							msg: data.msg,
 							username: name,
 							clientId: socket.id,
 							color: color,
 							roomCount: userCount
-						});
+						};
+						recentMessages.push(message);
+						while (recentMessages.length > 5) {
+							recentMessages.shift();
+						}
+						console.log('recent:', recentMessages);
+
+						// Pass message to all connected sockets
+						io.sockets.emit('message', message);
 					}
 				});
 			}
