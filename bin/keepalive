@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require "net/http"
+require "uri"
+
+urlString = "http://gradio.herokuapp.com/"
+puts "Keep alive: " + urlString
+uri = URI.parse(urlString)
+Net::HTTP.get_print(uri)
+
