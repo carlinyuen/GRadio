@@ -16,6 +16,7 @@ $(function()
 	var TIME_CHATBOX_ANIMATION = 400
 		, TIME_CHATBOX_HIDE = 1000
 		, TIME_CHATBOX_JIGGLE = 50
+		, TIME_REFRESH_RATE = 50
 	;
 
 	// Element references
@@ -29,11 +30,42 @@ $(function()
 	// Variables
 	var userId
 		, username
-		, color 
+		, color
 	;
 
+	// Click anywhere on background to mute / unmuet
+	$('body').click(function(event) {
+		$player[0].muted = !$player[0].muted;
+	});
+
+	// Rate limit events
+	var rateLimit = function(callback)
+	{
+		var rateHandler;
+		if (!rateHandler) {
+			callback();
+			rateHandler = setTimeout(function() {
+				rateHandler = null;
+			}, TIME_REFRESH_RATE);
+		}
+	};
+
+	// Follow mouse around
+	$(document).on('mousemove,touchmove', function(event) {
+		if (socket) {
+			rateLimit(function() {
+				socket.emit('move', {
+					x: event.pageX,
+					y: event.pageY,
+					w: $(window).width(),
+					h: $(window).height()
+				});
+			});
+		}
+	});
+
 	// Navigation bar
-	$('li a').click(function(event) 
+	$('li a').click(function(event)
 	{
 		event.preventDefault();	// Don't allow page change
 
@@ -53,15 +85,15 @@ $(function()
 		alert("Welcome to Carlin's favorite free online radio stations! Feel free to stick around and say hi in the chatter box.");
 	});
 
-	// Get GET query param, based on https://gist.github.com/varemenos/2531765 
-	function getParam(key, source) 
+	// Get GET query param, based on https://gist.github.com/varemenos/2531765
+	function getParam(key, source)
 	{
-		var result = new RegExp(key + "=([^&]*)", "i").exec(source ? source : window.location.search); 
-		return result && unescape(result[1]) || ""; 
+		var result = new RegExp(key + "=([^&]*)", "i").exec(source ? source : window.location.search);
+		return result && unescape(result[1]) || "";
 	}
 
 	// Switching music
-	function changeStation(sourceUrl) 
+	function changeStation(sourceUrl)
 	{
 		console.log('changeStation:', sourceUrl);
 
@@ -93,7 +125,7 @@ $(function()
 	}
 
 	// Add message to message view
-	function addMessage($html) 
+	function addMessage($html)
 	{
 		// Add message
 		$messages.append($html);
@@ -114,7 +146,7 @@ $(function()
 	}
 
 	// Message received
-	function messageReceived(data) 
+	function messageReceived(data)
 	{
 		console.log('messageReceived:', data);
 
@@ -124,32 +156,55 @@ $(function()
 				.text(data.username)
 				.css({ color: (data.clientId === userId) ? color : data.color })
 			));
-				
+
 		// Update listener count
 		updateRoomCount(data.roomCount);
 	}
 
 	// Notification received
-	function notificationReceived(data) 
+	function notificationReceived(data)
 	{
 		// Only come from server, so theoretically safe to render html
 		addMessage(data.msg);
-				
+
 		// Update listener count
 		updateRoomCount(data.roomCount);
+
+		// Create / destroy cursors
+		if (data.action == 'connect') {
+			$(document.createElement('div'))
+				.addClass('cursor')
+				.attr('id', data.clientId)
+				.appendTo('body');
+		}
+		if (data.action == 'disconnect') {
+			$('#' + data.clientId).fadeOut('fast', function() {
+				$(this).remove();
+			});
+		}
 	}
+
+	// Move mouse cursor
+	var moveCursor = function(data)
+	{
+		$('#' + data.clientId).css({
+			left: (($(window).width() - data.w) / 2 + data.x) + 'px',
+			top: data.y + 'px',
+		});
+	};
 
 	// SocketIO setup
 	socket.on('message', messageReceived);
 	socket.on('notification', notificationReceived);
-	
+	socket.on('move', moveCursor);
+
 	// Send button click
 	$sendButton.click(function(e)
 	{
 		var message = $inputField.val();
 		if (message.length) {
-			socket.emit('message', { 
-				msg: message 
+			socket.emit('message', {
+				msg: message
 			}, function(data) {
 				$inputField.val('');
 			});
@@ -170,11 +225,11 @@ $(function()
 
 	// Toggle show / hide of chat box
 	var chatCollapsed = false;
-	function toggleChatBox(event) 
+	function toggleChatBox(event)
 	{
 		chatCollapsed = !chatCollapsed;	// Toggle closed status
 		$form.animate({
-			bottom: (chatCollapsed ? -$form.height() : 0) 
+			bottom: (chatCollapsed ? -$form.height() : 0)
 		}, TIME_CHATBOX_ANIMATION);
 	}
 
@@ -183,7 +238,7 @@ $(function()
 
 	// Default volume to lower level when first loaded
 	$player[0].volume = 0.33;
-	
+
 	// Get any query param source and start audio
 	var source = getParam('source');
 	if (source) {
@@ -191,9 +246,8 @@ $(function()
 		changeStation(source);
 	}
 
-	// Ask for username
-	var name = prompt('By what name shall thy presence be known? (optional)');
-	socket.emit('setName', { name: name }, function(data) 
+	// Don't ask for username
+	socket.emit('setName', { name: null }, function(data)
 	{
 		console.log('setName:', data);
 

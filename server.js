@@ -34,6 +34,7 @@ app.get('/', function(req, res){
 // SocketIO - setup when new socket connection is created
 var userCount = 6;
 var recentMessages = [];
+var MAX_RECENT_MESSAGES = 10;
 io.sockets.on('connection', function (socket) {
 
 	userCount++;
@@ -43,7 +44,7 @@ io.sockets.on('connection', function (socket) {
 	{
 		var name;
 		if (!data || !data.name || !data.name.trim().length) {
-			name = 'Mystery wo/man';
+			name = 'Mysterio';
 		} else {
 			name = data.name.trim();
 		}
@@ -52,7 +53,9 @@ io.sockets.on('connection', function (socket) {
 		socket.set('name', name, function() {
 			io.sockets.emit('notification', {
 				msg:'<p class="text-warning">' + name + ' joined the party!</p>',
-				roomCount: userCount
+				roomCount: userCount,
+				clientId: socket.id,
+				action: 'connect'
 			});
 		});
 
@@ -84,8 +87,8 @@ io.sockets.on('connection', function (socket) {
 				socket.get('color', function(err, color) {
 					if (err) {
 						console.log(err);
-					} 
-					else 
+					}
+					else
 					{
 						// Create message and store for recent messages
 						var message = {
@@ -96,7 +99,7 @@ io.sockets.on('connection', function (socket) {
 							roomCount: userCount
 						};
 						recentMessages.push(message);
-						while (recentMessages.length > 5) {
+						while (recentMessages.length > MAX_RECENT_MESSAGES) {
 							recentMessages.shift();
 						}
 						console.log('recent:', recentMessages);
@@ -114,6 +117,13 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 
+	// Mouse moving, add socket id info into it
+	socket.on('move', function(data)
+	{
+		data.id = socket.id;
+		io.sockets.emit('move', data);
+	});
+
 	// Disconnecting
 	socket.on('disconnect', function()
 	{
@@ -125,7 +135,9 @@ io.sockets.on('connection', function (socket) {
 			} else {
 				io.sockets.emit('notification', {
 					msg:'<p class="text-info">' + name + ' left us. :o(</p>',
-					roomCount: userCount
+					roomCount: userCount,
+					clientId: socket.id,
+					action: 'disconnect'
 				});
 			}
 		});
