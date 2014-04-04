@@ -57,7 +57,6 @@ $(function()
 					w: $(window).width(),
 					h: $(window).height()
 				};
-				console.log('mouse moved:', data);
 				socket.emit('move', data);
 			});
 		}
@@ -184,8 +183,7 @@ $(function()
 	// Move mouse cursor
 	var moveCursor = function(data)
 	{
-		console.log('moveCursor:', data);
-
+		// Create cursor if it doesn't exist
 		if (data.clientId != userId && !$('#' + data.clientId).length) {
 			$(document.createElement('div'))
 				.addClass('cursor')
@@ -193,6 +191,7 @@ $(function()
 				.appendTo('body');
 		}
 
+		// Only move / create cursors that aren't our own
 		if (data.clientId != userId) {
 			console.log('move cursor:', data);
 			$('#' + data.clientId).css({
