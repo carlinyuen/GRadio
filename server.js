@@ -120,7 +120,7 @@ io.sockets.on('connection', function (socket) {
 	// Mouse moving, add socket id info into it
 	socket.on('move', function(data)
 	{
-		data.id = socket.id;
+		data.clientId = socket.id;
 		io.sockets.emit('move', data);
 	});
 

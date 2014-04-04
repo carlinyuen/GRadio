@@ -33,11 +33,6 @@ $(function()
 		, color
 	;
 
-	// Click anywhere on background to mute / unmuet
-	$('body').click(function(event) {
-		$player[0].muted = !$player[0].muted;
-	});
-
 	// Rate limit events
 	var rateLimit = function(callback)
 	{
@@ -49,20 +44,26 @@ $(function()
 			}, TIME_REFRESH_RATE);
 		}
 	};
-
-	// Follow mouse around
-	$(document).on('mousemove,touchmove', function(event) {
+	
+	var updateMouseLocation = function(event) {
+		console.log('mousemove');
 		if (socket) {
 			rateLimit(function() {
-				socket.emit('move', {
+				var data = {
 					x: event.pageX,
 					y: event.pageY,
 					w: $(window).width(),
 					h: $(window).height()
-				});
+				};
+				console.log('mouse moved:', data);
+				socket.emit('move', data);
 			});
 		}
-	});
+	};
+
+	// Follow mouse around
+	$('body').on('mousemove', updateMouseLocation);
+	$('body').on('touchmove', updateMouseLocation);
 
 	// Navigation bar
 	$('li a').click(function(event)
@@ -170,13 +171,7 @@ $(function()
 		// Update listener count
 		updateRoomCount(data.roomCount);
 
-		// Create / destroy cursors
-		if (data.action == 'connect') {
-			$(document.createElement('div'))
-				.addClass('cursor')
-				.attr('id', data.clientId)
-				.appendTo('body');
-		}
+		// Destroy cursors
 		if (data.action == 'disconnect') {
 			$('#' + data.clientId).fadeOut('fast', function() {
 				$(this).remove();
@@ -187,10 +182,24 @@ $(function()
 	// Move mouse cursor
 	var moveCursor = function(data)
 	{
-		$('#' + data.clientId).css({
-			left: (($(window).width() - data.w) / 2 + data.x) + 'px',
-			top: data.y + 'px',
-		});
+		console.log('moveCursor:', data);
+
+		// Create cursor if it doesn't exist
+		if (data.clientId != userId && !$('#' + data.clientId).length) {
+			$(document.createElement('div'))
+				.addClass('cursor')
+				.attr('id', data.clientId)
+				.appendTo('body');
+		}
+
+		// Only move / create cursors that aren't our own
+		if (data.clientId != userId) {
+			console.log('move cursor:', data);
+			$('#' + data.clientId).css({
+				left: (($(window).width() - data.w) / 2 + data.x) + 'px',
+				top: data.y + 'px',
+			});
+		}
 	};
 
 	// SocketIO setup
