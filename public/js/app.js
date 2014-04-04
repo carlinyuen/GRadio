@@ -191,7 +191,6 @@ $(function()
 
 		// Only move / create cursors that aren't our own
 		if (data.clientId != userId) {
-			console.log('move cursor:', data);
 			$('#' + data.clientId).css({
 				left: (($(window).width() - data.w) / 2 + data.x) + 'px',
 				top: data.y + 'px',
