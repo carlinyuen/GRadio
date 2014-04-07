@@ -40,13 +40,24 @@ io.sockets.on('connection', function (socket) {
 	userCount++;
 
 	// Set name and let people know you joined
-	socket.on('setName', function (data, callback)
+	socket.on('initUser', function (data, callback)
 	{
 		var name;
 		if (!data || !data.name || !data.name.trim().length) {
 			name = 'Mysterio';
 		} else {
 			name = data.name.trim();
+		}
+
+		// If clientId is passed back, subtract from usercount to prevent double
+		// counting and emit message to clients to update id
+		if (data.clientId) {
+			userCount--;
+			io.sockets.emit('notification', {
+				roomCount: userCount,
+				clientId: data.clientId,
+				action: 'disconnect'
+			});
 		}
 
 		// Set name and emit to others
