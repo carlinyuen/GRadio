@@ -48,7 +48,6 @@ $(function()
 	};
 	
 	var updateMouseLocation = function(event) {
-		console.log('mousemove');
 		if (socket) {
 			rateLimit(function() {
 				var data = {
@@ -167,7 +166,9 @@ $(function()
 	function notificationReceived(data)
 	{
 		// Only come from server, so theoretically safe to render html
-		addMessage(data.msg);
+		if (data.msg) {
+			addMessage(data.msg);
+		}
 
 		// Update listener count
 		updateRoomCount(data.roomCount);
@@ -181,14 +182,16 @@ $(function()
 	}
 
 	// Move mouse cursor
-	var moveCursor = function(data)
+	function moveCursor(data)
 	{
 		// Create cursor if it doesn't exist
 		if (data.clientId != userId && !$('#' + data.clientId).length) {
 			$(document.createElement('div'))
 				.addClass('cursor')
 				.attr('id', data.clientId)
-				.appendTo('body');
+				.hide()
+				.appendTo('body')
+				.fadeIn('fast');
 		}
 
 		// Only move / create cursors that aren't our own
@@ -198,12 +201,56 @@ $(function()
 				top: data.y + 'px',
 			});
 		}
-	};
+	}
+
+	// Initialize user
+	function initUser()
+	{
+		socket.emit('initUser', { 
+			name: username,		// send back old username if exists
+			clientId: userId,	// send back old id if exists
+		}, function(data)
+		{
+			console.log('initUser:', data);
+
+			// Clear out all existing cursors
+			$('.cursor').fadeOut('fast', function() {
+				$(this).remove();
+			});
+
+			// Setup user prefs
+			userId = data.clientId;
+			username = data.name;
+			color = data.color;
+
+			// Add recent messages
+			console.log('recent:', data.recentMessages);
+			for (var i = 0, l = data.recentMessages.length; i < l; ++i) {
+				messageReceived(data.recentMessages[i]);
+			}
+
+			// Update listener count
+			updateRoomCount(data.roomCount);
+		});
+	}
+
+	// Socketio error
+	function socketError(err)
+	{
+		console.log('socketError:', err);
+
+		// Remove all cursors
+		$('.cursor').fadeOut('fast', function() {
+			$(this).remove();
+		});
+	}
 
 	// SocketIO setup
+	socket.on('connect', initUser);
 	socket.on('message', messageReceived);
 	socket.on('notification', notificationReceived);
 	socket.on('move', moveCursor);
+	socket.on('error', socketError);
 
 	// Send button click
 	$sendButton.click(function(e)
@@ -252,26 +299,6 @@ $(function()
 		console.log('onload source:', source);
 		changeStation(source);
 	}
-
-	// Don't ask for username
-	socket.emit('setName', { name: null }, function(data)
-	{
-		console.log('setName:', data);
-
-		// Setup user prefs
-		userId = data.clientId;
-		username = data.name;
-		color = data.color;
-
-		// Add recent messages
-		console.log('recent:', data.recentMessages);
-		for (var i = 0, l = data.recentMessages.length; i < l; ++i) {
-			messageReceived(data.recentMessages[i]);
-		}
-
-		// Update listener count
-		updateRoomCount(data.roomCount);
-	});
 
 	// Default to collapsed, delay it so it animates smoothly and shows the player
 	setTimeout(toggleChatBox, TIME_CHATBOX_HIDE);

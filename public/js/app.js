@@ -46,7 +46,6 @@ $(function()
 	};
 	
 	var updateMouseLocation = function(event) {
-		console.log('mousemove');
 		if (socket) {
 			rateLimit(function() {
 				var data = {
@@ -200,7 +199,7 @@ $(function()
 				top: data.y + 'px',
 			});
 		}
-	};
+	}
 
 	// Initialize user
 	function initUser()
@@ -211,6 +210,11 @@ $(function()
 		}, function(data)
 		{
 			console.log('initUser:', data);
+
+			// Clear out all existing cursors
+			$('.cursor').fadeOut('fast', function() {
+				$(this).remove();
+			});
 
 			// Setup user prefs
 			userId = data.clientId;
@@ -226,13 +230,25 @@ $(function()
 			// Update listener count
 			updateRoomCount(data.roomCount);
 		});
-	};
+	}
+
+	// Socketio error
+	function socketError(err)
+	{
+		console.log('socketError:', err);
+
+		// Remove all cursors
+		$('.cursor').fadeOut('fast', function() {
+			$(this).remove();
+		});
+	}
 
 	// SocketIO setup
 	socket.on('connect', initUser);
 	socket.on('message', messageReceived);
 	socket.on('notification', notificationReceived);
 	socket.on('move', moveCursor);
+	socket.on('error', socketError);
 
 	// Send button click
 	$sendButton.click(function(e)
