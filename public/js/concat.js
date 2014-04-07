@@ -18,7 +18,7 @@ $(function()
 	var TIME_CHATBOX_ANIMATION = 400
 		, TIME_CHATBOX_HIDE = 1000
 		, TIME_CHATBOX_JIGGLE = 50
-		, TIME_REFRESH_RATE = 50
+		, TIME_REFRESH_RATE = 30
 	;
 
 	// Element references
