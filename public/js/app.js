@@ -69,10 +69,14 @@ $(function()
 		event.preventDefault();	// Don't allow page change
 
 		// Get source
-		var newSource = getParam('source', $(this).attr('href'));
+		var url = $(this).attr('href');
+		var newSource = getParam('source', url);
 
 		// Change out source of audio
 		changeStation(newSource);
+
+		// Also update browser url
+		window.history.pushState(null, $(this).text(), url);
 
 		// Update to active li element
 		$('.navbar').find('li').removeClass('active');
@@ -296,6 +300,8 @@ $(function()
 	if (source) {
 		console.log('onload source:', source);
 		changeStation(source);
+	} else {
+		$('li a').get(0).click();
 	}
 
 	// Default to collapsed, delay it so it animates smoothly and shows the player
